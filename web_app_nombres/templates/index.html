@@ -11,21 +11,17 @@
       <header>
         <h1>¿Cuál suena mejor?</h1>
         <p class="lead">
-          Elegí la opción que te suena más natural al decir el nombre completo en voz alta.
-          Ignorá moda, ortografía y significado.
+          Elige la opción que te suena más natural al decir el nombre completo en voz alta.
+          Ignora moda, ortografía y significado.
         </p>
       </header>
 
       <section id="panel-juego" class="card hidden">
         <p id="contexto" class="contexto"></p>
-        <p class="pregunta">¿Con cuál te quedás?</p>
+        <p class="pregunta">¿Cuál prefieres?</p>
         <div class="opciones">
           <button type="button" class="opcion" id="btn-a" data-ganador="A"></button>
           <button type="button" class="opcion" id="btn-b" data-ganador="B"></button>
-        </div>
-        <div class="progreso">
-          <span id="texto-progreso">Cargando…</span>
-          <div class="barra"><span id="barra-progreso"></span></div>
         </div>
         <p id="error" class="error hidden"></p>
       </section>
@@ -37,7 +33,7 @@
       <section id="panel-fin" class="card estado hidden">
         <h2>¡Gracias!</h2>
         <p id="mensaje-fin">
-          Completaste todas las comparaciones disponibles en esta sesión.
+          Gracias por ayudarnos. Puedes cerrar esta página cuando quieras.
         </p>
       </section>
     </div>
@@ -49,8 +45,6 @@
       const btnA = document.getElementById("btn-a");
       const btnB = document.getElementById("btn-b");
       const contexto = document.getElementById("contexto");
-      const textoProgreso = document.getElementById("texto-progreso");
-      const barraProgreso = document.getElementById("barra-progreso");
       const errorEl = document.getElementById("error");
 
       let parActual = null;
@@ -62,12 +56,6 @@
 
       function ocultar(el) {
         el.classList.add("hidden");
-      }
-
-      function actualizarProgreso(votados, total) {
-        textoProgreso.textContent = `${votados} de ${total} comparaciones`;
-        const pct = total > 0 ? Math.round((100 * votados) / total) : 0;
-        barraProgreso.style.width = `${pct}%`;
       }
 
       function mostrarError(msg) {
@@ -88,7 +76,6 @@
         const res = await fetch("/api/par");
         if (!res.ok) throw new Error("No se pudo cargar el par.");
         const data = await res.json();
-        actualizarProgreso(data.votados, data.total);
 
         if (!data.par) {
           ocultar(panelJuego);
@@ -143,7 +130,7 @@
         ocultar(panelCargando);
         panelFin.querySelector("h2").textContent = "Error de conexión";
         document.getElementById("mensaje-fin").textContent =
-          "No pudimos conectar con el servidor. Revisá que la app y la base de datos estén activas.";
+          "No pudimos conectar con el servidor. Revisa que la app y la base de datos estén activas.";
         mostrar(panelFin);
       });
     </script>
