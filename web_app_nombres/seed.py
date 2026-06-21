@@ -53,18 +53,19 @@ def seed_if_empty() -> int:
         raise RuntimeError("No hay filas T2 en pilot_pares.csv")
 
     with conectar() as conn:
-        conn.executemany(
-            """
-            INSERT INTO pares (
-                tipo, genero, apellido1, apellido2,
-                nombre_a, nombre_b, forma_a, forma_b, estrategia
-            ) VALUES (
-                %(tipo)s, %(genero)s, %(apellido1)s, %(apellido2)s,
-                %(nombre_a)s, %(nombre_b)s, %(forma_a)s, %(forma_b)s, %(estrategia)s
+        with conn.cursor() as cur:
+            cur.executemany(
+                """
+                INSERT INTO pares (
+                    tipo, genero, apellido1, apellido2,
+                    nombre_a, nombre_b, forma_a, forma_b, estrategia
+                ) VALUES (
+                    %(tipo)s, %(genero)s, %(apellido1)s, %(apellido2)s,
+                    %(nombre_a)s, %(nombre_b)s, %(forma_a)s, %(forma_b)s, %(estrategia)s
+                )
+                """,
+                filas,
             )
-            """,
-            filas,
-        )
         conn.commit()
 
     return len(filas)
