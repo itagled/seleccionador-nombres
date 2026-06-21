@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "proposito": "Muestras fijas para pilot de pares T1/T2/T3 (etiquetado LLM + entrenamiento w_global)",
+  "fuentes": {
+    "nombres_f": "data/raw/ergobaby-2024.txt (niña, Chile 2024)",
+    "nombres_m": "data/raw/ergobaby-2024.txt (niño, Chile 2024)",
+    "apellidos_t2": "data/intermedio/apellidos_hispanos_100.txt",
+    "pares_t3": "data/intermedio/pares_apellidos_100.txt (+ Tagle|Díaz compuesto del catálogo)"
+  },
+  "plan_pilot": {
+    "filas_objetivo": 1000,
+    "reparto_sugerido": {"T1": 0, "T2": 500, "T3": 500},
+    "pares_nombres_por_contexto": 25,
+    "notas": "T1 reservado para fase app; este archivo alimenta T2 y T3."
+  },
+  "nombres_f": [
+    "Sofía", "Valentina", "Martina", "Lucía", "Emma", "Victoria", "Elena", "María",
+    "Camila", "Valeria", "Isabella", "Gabriela", "Daniela", "Amelia", "Ana", "Catalina",
+    "Julieta", "Aitana", "Ximena", "Luna", "Sara", "Paula", "Emilia", "Clara", "Olivia",
+    "Julia", "Renata", "Mía", "Regina", "Fernanda", "Isabel", "Cecilia", "Alejandra",
+    "Diana", "Carmen", "Rocío", "Laura", "Andrea", "Miranda", "Jimena", "Irene",
+    "Belén", "Paloma", "Manuela", "Inés", "Josefina", "Begoña", "Ramona", "Ignacia",
+    "Milagros"
+  ],
+  "nombres_m": [
+    "Mateo", "Santiago", "Sebastián", "Matías", "Martín", "Benjamín", "Lucas", "Nicolás",
+    "Samuel", "Thiago", "Emiliano", "Diego", "Tomás", "Joaquín", "Gabriel", "David",
+    "Juan", "José", "Pablo", "Adrián", "Bruno", "Maximiliano", "Agustín", "Antonio",
+    "Manuel", "Emilio", "Rafael", "Vicente", "Javier", "Carlos", "Leonardo", "Alejandro",
+    "Franco", "Andrés", "Rodrigo", "Enzo", "Ángel", "Miguel", "Isaac", "Gael",
+    "Álvaro", "Felipe", "Rubén", "Pedro", "Óscar", "Raúl", "Baltasar", "Casimiro",
+    "Demetrio", "Edmundo"
+  ],
+  "apellidos_t2": [
+    "García", "Rodríguez", "González", "López", "Martínez", "Díaz", "Romero", "Torres",
+    "Herrera", "Flores", "Cruz", "Muñoz", "Iglesias", "Castillo", "Rubio", "Navarro",
+    "Sepúlveda", "Tapia", "Valenzuela", "Tagle"
+  ],
+  "pares_t3": [
+    {"apellido1": "García", "apellido2": "Romero"},
+    {"apellido1": "Rodríguez", "apellido2": "Herrera"},
+    {"apellido1": "González", "apellido2": "Orellana"},
+    {"apellido1": "López", "apellido2": "Aguilar"},
+    {"apellido1": "Martínez", "apellido2": "Tagle"},
+    {"apellido1": "Tagle", "apellido2": "Díaz"},
+    {"apellido1": "Sánchez", "apellido2": "Marín"},
+    {"apellido1": "Díaz", "apellido2": "Paredes"},
+    {"apellido1": "Muñoz", "apellido2": "Rodríguez"},
+    {"apellido1": "Romero", "apellido2": "Iglesias"},
+    {"apellido1": "Torres", "apellido2": "Rojas"},
+    {"apellido1": "Hernández", "apellido2": "Peña"},
+    {"apellido1": "Morales", "apellido2": "Díaz"},
+    {"apellido1": "Castro", "apellido2": "Fuentes"},
+    {"apellido1": "Ortega", "apellido2": "Contreras"},
+    {"apellido1": "Vázquez", "apellido2": "Campos"},
+    {"apellido1": "Medina", "apellido2": "Crespo"},
+    {"apellido1": "Sepúlveda", "apellido2": "Martínez"},
+    {"apellido1": "Bravo", "apellido2": "Vidal"},
+    {"apellido1": "Espinoza", "apellido2": "Solís"}
+  ],
+  "criterios_seleccion": {
+    "nombres": "Top ergobaby 2024 + mezcla clásicos (María, José), moda reciente (Luna, Mateo) y arcaicos al final del listado (Casimiro, Begoña, …).",
+    "apellidos_t2": "20 de los 100 hispanos: alta frecuencia (García–Martínez), variedad fonética (-ez, -ía, -lle) y Tagle.",
+    "pares_t3": "19 pares del archivo de 100 + Tagle|Díaz (ambos apellidos en catálogo; par canónico del proyecto)."
+  }
+}
