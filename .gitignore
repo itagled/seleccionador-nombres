@@ -1,4 +1,34 @@
-﻿node_modules/
+﻿# Dependencias y entorno
+node_modules/
 .env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# SO
 .DS_Store
 Thumbs.db
+
+# Binarios locales
+vendor/espeak-ng/
+
+# Datos regenerables
+data/db/
+data/outputs/
+data/guaguas_pkg/
+
+# Raw pesado (descargable; ver data/raw/fuentes.txt)
+data/raw/guaguas.csv
+data/raw/nombres_por_edad_media.xlsx
+
+# IDE
+.vscode/
+.idea/
+*.swp

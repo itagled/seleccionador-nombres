@@ -1,0 +1,7 @@
+phonemizer>=3.2,<4
+pandas>=2.0,<3
+openpyxl>=3.1,<4
+
+# Fonética: requiere espeak-ng (python scripts/setup/setup_espeak.py en Windows)
+# Para descargar guaguas: pip install rdata
+# Para PostgreSQL (migración futura): psycopg[binary]>=3.2,<4

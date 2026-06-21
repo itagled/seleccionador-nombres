@@ -1,0 +1,8 @@
+nombres-femeninos-frecuencia-edad-2012.csv = https://github.com/marcboquet/spanish-names/tree/master
+nombres-masculinos-frecuencia-edad-2012.csv = https://github.com/marcboquet/spanish-names/tree/master
+guaguas = https://rivaquiroga.github.io/guaguas/index.html
+raw/guaguas.csv = https://cran.r-project.org/package=guaguas (paquete R, dataset completo: 858.782 filas, Chile 1920-2021)
+raw/guaguas_frecuentes.csv = https://cran.r-project.org/package=guaguas (nombres con >= 15 ocurrencias por año: 86.366 filas)
+nombres_por_edad_media.xlsx = https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736177009&menu=resultados&idp=1254735572981#_tabs-1254736195454
+raw/ergobaby-2024.txt = https://ergobaby.cl/blog/portabebes/los-100-nombres-mas-populares-para-ninos-ninas-en-2024
+raw/bio-bio-2024.txt = https://www.biobiochile.cl/noticias/servicios/toma-nota/2024/12/06/los-100-nombres-de-ninas-y-ninos-mas-inscritos-el-2024-en-chile-isabella-podria-superar-a-emma.shtml

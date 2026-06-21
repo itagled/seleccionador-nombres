@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: seleccionador-nombres-db
+    environment:
+      POSTGRES_DB: seleccionador_nombres
+      POSTGRES_USER: seleccionador
+      POSTGRES_PASSWORD: seleccionador
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
