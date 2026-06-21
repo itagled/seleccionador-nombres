@@ -56,7 +56,7 @@ Ver [`scripts/README.md`](../scripts/README.md).
 |---------|-----|
 | `lib/` | `fonetica_scoring.py`, `familiaridad.py`, `phonemizer_config.py`, … |
 | `bdd/` | `rebuild_nombres.py`, `poblar_fonetica.py`, `poblar_familiaridad.py` |
-| `evaluacion/` | `evaluar_combinacion.py`, `evaluar_lote.py`, `evaluar_cruzada.py`, `export_csv.py`, `exportar_features.py` |
+| `evaluacion/` | `evaluar_combinacion.py`, `generar_pares_pilot.py`, `etiquetar_pares_llm.py`, `clasificar_pares_humano.py`, `comparar_jueces_t2.py`, … |
 | `dev/` | `verificar_features.py`, análisis cruzada 10k |
 
 Schema: `001_nombres.sql`, `002_fonetica.sql`, `003_familiaridad.sql`.
@@ -195,12 +195,29 @@ Approach B (fine-tune en dos etapas): no prioritario.
 
 ### Bootstrap LLM
 
-1. Muestreo estratificado T2/T3.
-2. Prompt: eufonía al **decir en voz alta** (es-419); ignorar popularidad.
+1. Muestreo estratificado T2/T3 (`generar_pares_pilot.py` → 1000 pares pilot).
+2. Prompt: eufonía al **decir en voz alta** (es-419); variantes `eufonico` | `cotidiano` en `scripts/lib/prompts_llm.py`.
 3. IPA en prompt recomendado para T2/T3 (ortografía engaña).
-4. CSV: `tipo, ap1, ap2, genero, nombre_a, nombre_b, ganador, fuente`.
+4. CSV: `tipo, ap1, ap2, genero, nombre_a, nombre_b, ganador, fuente, modelo, prompt`.
+5. **Calibración LLM:** pendiente hasta tener más anclas humanas diversas (ver abajo). Opciones a evaluar después: few-shot con ejemplos humanos, peso `α` en Bradley–Terry, híbrido v2/LLM en pares cercanos.
 
-### UX web app (mismo formato)
+**Pilot terminal (50 pares, ancla única):** Sonnet + prompt eufónico ≈ **64% acuerdo T2** vs humano; mejor que baseline v2 (52%). Muestra sesgada (casi todo García + niñas) — no extrapolar.
+
+### Recolección humana vía web app *(prioridad actual)*
+
+**Decisión:** Construir una **web app con comparador de nombres** y compartirla con conocidos para acumular preferencias pairwise antes de escalar LLM o definir calibración.
+
+| Aspecto | Plan |
+|---------|------|
+| UI | Comparador T2: `Nombre A Apellido` vs `Nombre B Apellido` (mismo apellido en ambos lados) |
+| Distribución | Enlace compartido; cada persona elige apellido(s) y género del bebé o recibe contexto fijo por enlace |
+| Objetivo | Diversidad de jueces y apellidos (contrarrestar sesgo del pilot en terminal) |
+| Persistencia | CSV/BD: `ganador`, `fuente=humano_web`, metadatos de sesión (sin PII innecesaria) |
+| Después | Con masa crítica (50–100+ pares, varios anotadores): medir acuerdo LLM vs humano, entrenar `w_global`, ajustar prompts |
+
+La app de producto final (ranking + `w_user` online) comparte el mismo formato de par; esta versión inicial prioriza **solo recolección** para ancla offline.
+
+### UX web app (producto)
 
 Tras apellidos del bebé: T1 (6–8 pares) → T2 (8–12) → T3 (8–12) ≈ **25–30 clics**. Selección activa: pares con `P ≈ 0,5`. Respuestas → `w_user`.
 
@@ -235,11 +252,13 @@ Tras apellidos del bebé: T1 (6–8 pares) → T2 (8–12) → T3 (8–12) ≈ *
 
 ## Próximos pasos
 
-**Fase 1 — Bootstrap LLM (A):** `generar_pares_llm.py` → pilot 500–1k → ancla humana 50–100 pares.
+**Fase 0 — Comparador web (recolección humana):** web app pairwise T2 → compartir con conocidos → export anclas (`fuente=humano_web`). Scripts CLI (`clasificar_pares_humano.py`) quedan como respaldo / desarrollo.
 
-**Fase 2 — Modelo global (A):** `entrenar_ranker.py` → export `w_global` → validación vs v2.
+**Fase 1 — Bootstrap LLM (A):** pilot 1000 generado ✅; etiquetado LLM parcial (50 pares Sonnet); escalar o pausar según volumen humano web.
 
-**Fase 3 — App (C):** `rank_nombres.py` → selección activa de pares → API sesión `w_user` → web app.
+**Fase 2 — Calibración y modelo global (A):** con anclas web → acuerdo LLM vs humano, `entrenar_ranker.py`, export `w_global`, validación vs v2.
+
+**Fase 3 — App producto (C):** ranking + selección activa de pares → API sesión `w_user` → misma web app evolucionada.
 
 **Después:** refrescar `w_global` con pares agregados de usuarios; post-rebuild unificado; PostgreSQL / deploy.
 
