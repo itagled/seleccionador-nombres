@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comparador de nombres</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>¿Cuál suena mejor?</h1>
+        <p class="lead">
+          Elegí la opción que te suena más natural al decir el nombre completo en voz alta.
+          Ignorá moda, ortografía y significado.
+        </p>
+      </header>
+
+      <section id="panel-juego" class="card hidden">
+        <p id="contexto" class="contexto"></p>
+        <p class="pregunta">¿Con cuál te quedás?</p>
+        <div class="opciones">
+          <button type="button" class="opcion" id="btn-a" data-ganador="A"></button>
+          <button type="button" class="opcion" id="btn-b" data-ganador="B"></button>
+        </div>
+        <div class="progreso">
+          <span id="texto-progreso">Cargando…</span>
+          <div class="barra"><span id="barra-progreso"></span></div>
+        </div>
+        <p id="error" class="error hidden"></p>
+      </section>
+
+      <section id="panel-cargando" class="card estado">
+        <h2>Cargando comparación…</h2>
+      </section>
+
+      <section id="panel-fin" class="card estado hidden">
+        <h2>¡Gracias!</h2>
+        <p id="mensaje-fin">
+          Completaste todas las comparaciones disponibles en esta sesión.
+        </p>
+      </section>
+    </div>
+
+    <script>
+      const panelJuego = document.getElementById("panel-juego");
+      const panelCargando = document.getElementById("panel-cargando");
+      const panelFin = document.getElementById("panel-fin");
+      const btnA = document.getElementById("btn-a");
+      const btnB = document.getElementById("btn-b");
+      const contexto = document.getElementById("contexto");
+      const textoProgreso = document.getElementById("texto-progreso");
+      const barraProgreso = document.getElementById("barra-progreso");
+      const errorEl = document.getElementById("error");
+
+      let parActual = null;
+      let enviando = false;
+
+      function mostrar(el) {
+        el.classList.remove("hidden");
+      }
+
+      function ocultar(el) {
+        el.classList.add("hidden");
+      }
+
+      function actualizarProgreso(votados, total) {
+        textoProgreso.textContent = `${votados} de ${total} comparaciones`;
+        const pct = total > 0 ? Math.round((100 * votados) / total) : 0;
+        barraProgreso.style.width = `${pct}%`;
+      }
+
+      function mostrarError(msg) {
+        errorEl.textContent = msg;
+        mostrar(errorEl);
+      }
+
+      function limpiarError() {
+        errorEl.textContent = "";
+        ocultar(errorEl);
+      }
+
+      async function cargarPar() {
+        limpiarError();
+        btnA.disabled = true;
+        btnB.disabled = true;
+
+        const res = await fetch("/api/par");
+        if (!res.ok) throw new Error("No se pudo cargar el par.");
+        const data = await res.json();
+        actualizarProgreso(data.votados, data.total);
+
+        if (!data.par) {
+          ocultar(panelJuego);
+          ocultar(panelCargando);
+          mostrar(panelFin);
+          return;
+        }
+
+        parActual = data.par;
+        contexto.textContent = `Bebé: ${parActual.genero} · Apellido: ${parActual.apellido1}`;
+        btnA.textContent = parActual.forma_a;
+        btnB.textContent = parActual.forma_b;
+        btnA.disabled = false;
+        btnB.disabled = false;
+
+        ocultar(panelCargando);
+        ocultar(panelFin);
+        mostrar(panelJuego);
+      }
+
+      async function votar(ganador) {
+        if (!parActual || enviando) return;
+        enviando = true;
+        limpiarError();
+        btnA.disabled = true;
+        btnB.disabled = true;
+
+        try {
+          const res = await fetch("/api/voto", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ par_id: parActual.id, ganador }),
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.detail || "No se pudo guardar el voto.");
+          }
+          await cargarPar();
+        } catch (err) {
+          mostrarError(err.message || "Error al guardar.");
+          btnA.disabled = false;
+          btnB.disabled = false;
+        } finally {
+          enviando = false;
+        }
+      }
+
+      btnA.addEventListener("click", () => votar("A"));
+      btnB.addEventListener("click", () => votar("B"));
+
+      cargarPar().catch(() => {
+        ocultar(panelCargando);
+        panelFin.querySelector("h2").textContent = "Error de conexión";
+        document.getElementById("mensaje-fin").textContent =
+          "No pudimos conectar con el servidor. Revisá que la app y la base de datos estén activas.";
+        mostrar(panelFin);
+      });
+    </script>
+  </body>
+</html>
