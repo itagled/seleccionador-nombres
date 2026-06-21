@@ -8,6 +8,8 @@ from dataclasses import dataclass
 
 from bootstrap import DATA_DB
 
+from familiaridad import familiaridad_de
+
 DB_PATH = DATA_DB
 
 VOCALES = frozenset("aeiouɪ")
@@ -244,6 +246,9 @@ class FeaturesEvaluacion:
     rima_vocalica_ap1: float
     rima_completa_ap2: float
     rima_vocalica_ap2: float
+    # Eje 5 — Familiaridad (INTRÍNSECA; guaguas Chile)
+    log_familiaridad: float
+    prop_reciente: float
 
     def to_dict(self) -> dict[str, str | int | float]:
         return {
@@ -261,6 +266,8 @@ class FeaturesEvaluacion:
             "rima_vocalica_ap1": self.rima_vocalica_ap1,
             "rima_completa_ap2": self.rima_completa_ap2,
             "rima_vocalica_ap2": self.rima_vocalica_ap2,
+            "log_familiaridad": self.log_familiaridad,
+            "prop_reciente": self.prop_reciente,
         }
 
 
@@ -1029,17 +1036,20 @@ def extraer_features(
     apellido1: str,
     apellido2: str,
     ipa_piezas: tuple[str, str, str],
+    genero: str,
     lexico: LexicoFonotactico | None = None,
+    conn: sqlite3.Connection | None = None,
 ) -> FeaturesEvaluacion:
     """Extrae señales crudas (5 ejes) sin pasar por criterios A–Q cocinados."""
     if lexico is None:
-        lexico = obtener_lexico()
+        lexico = obtener_lexico(conn)
     piezas = [
         analizar_pieza(nombre, ipa_piezas[0]),
         analizar_pieza(apellido1, ipa_piezas[1]),
         analizar_pieza(apellido2, ipa_piezas[2]),
     ]
     nom, ap1, ap2 = piezas[0], piezas[1], piezas[2]
+    _, log_fam, prop_rec = familiaridad_de(nombre, genero, conn=conn)
     return FeaturesEvaluacion(
         nombre=nombre,
         apellido1=apellido1,
@@ -1055,6 +1065,8 @@ def extraer_features(
         rima_vocalica_ap1=_rima_vocalica_entre(nom, ap1),
         rima_completa_ap2=_rima_completa_entre(nom, ap2),
         rima_vocalica_ap2=_rima_vocalica_entre(nom, ap2),
+        log_familiaridad=log_fam,
+        prop_reciente=prop_rec,
     )
 
 

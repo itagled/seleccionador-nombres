@@ -65,7 +65,7 @@ def imprimir_verificacion(conn: sqlite3.Connection) -> None:
         if row:
             filas.append(row)
         else:
-            prev, log_f = familiaridad_de(nombre, genero, conn=conn)
+            prev, log_f, _ = familiaridad_de(nombre, genero, conn=conn)
             filas.append((nombre, genero, prev, log_f, None))
 
     filas.sort(key=lambda r: r[3], reverse=True)

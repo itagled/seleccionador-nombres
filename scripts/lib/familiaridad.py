@@ -123,8 +123,8 @@ def familiaridad_de(
     nombre: str,
     genero: str,
     conn: sqlite3.Connection | None = None,
-) -> tuple[float, float]:
-    """Lookup (prevalencia, log_familiaridad) para un par nombre/género del catálogo."""
+) -> tuple[float, float, float]:
+    """Lookup (prevalencia, log_familiaridad, prop_reciente) para nombre/género."""
     nombre_db = normalizar_nombre(nombre)
     genero_db = genero.strip().upper()
     cerrar = False
@@ -134,7 +134,7 @@ def familiaridad_de(
     try:
         fila = conn.execute(
             """
-            SELECT f.prevalencia, f.log_familiaridad
+            SELECT f.prevalencia, f.log_familiaridad, f.prop_reciente
             FROM familiaridad f
             JOIN nombres n ON n.id = f.nombre_id
             WHERE n.nombre = ? AND n.genero = ?
@@ -143,8 +143,9 @@ def familiaridad_de(
             (nombre_db, genero_db),
         ).fetchone()
         if fila is None:
-            return 0.0, log_familiaridad_de_prevalencia(0.0)
-        return float(fila[0]), float(fila[1])
+            return 0.0, log_familiaridad_de_prevalencia(0.0), 0.0
+        prop = fila[2]
+        return float(fila[0]), float(fila[1]), float(prop) if prop is not None else 0.0
     finally:
         if cerrar:
             conn.close()

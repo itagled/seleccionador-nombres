@@ -35,7 +35,13 @@ def main() -> int:
             ipa_a1, _ = resolver_fonetica(conn, ap1, None, es_nombre=False)
             ipa_a2, _ = resolver_fonetica(conn, ap2, None, es_nombre=False)
             feat = extraer_features(
-                nombre, ap1, ap2, (ipa_n, ipa_a1, ipa_a2), lexico=lexico
+                nombre,
+                ap1,
+                ap2,
+                (ipa_n, ipa_a1, ipa_a2),
+                genero,
+                lexico=lexico,
+                conn=conn,
             )
             lineas.append(f"\n{nombre} {ap1} {ap2} ({genero})")
             lineas.append(f"  IPA: {ipa_n} | {ipa_a1} | {ipa_a2}")
@@ -45,8 +51,12 @@ def main() -> int:
                 lineas.append(f"  {k}: {v}")
 
     out = DATA_OUTPUTS / "_verif_features.txt"
-    out.write_text("\n".join(lineas) + "\n", encoding="utf-8")
-    print(out.read_text(encoding="utf-8"))
+    texto = "\n".join(lineas) + "\n"
+    out.write_text(texto, encoding="utf-8")
+    try:
+        print(texto, end="")
+    except UnicodeEncodeError:
+        print(f"Escrito en {out}")
     return 0
 
 
